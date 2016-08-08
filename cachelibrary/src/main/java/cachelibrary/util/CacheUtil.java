@@ -99,9 +99,9 @@ public class CacheUtil
   }
 
 
-  public static final ArrayList<Pair<?, Cachable>> getData(List<? extends Cachable> cachables, FetchData fetcher)
+  public static final ArrayList<Pair<?, ? extends Cachable>> getData(List<? extends Cachable> cachables, FetchData fetcher)
   {
-    ArrayList<Pair<?, Cachable>> accumulator = new ArrayList<>();
+    ArrayList<Pair<?, ? extends Cachable>> accumulator = new ArrayList<>();
     for (Cachable cachable : cachables)
     {
       Object obj = getData(cachable, fetcher);
