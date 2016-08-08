@@ -83,7 +83,7 @@ public class CacheUtil
   }
 
 
-  public static final <T> T getData(Cachable cachable, FetchData fetcher)
+  public static final <T, C extends Cachable> T getData(C cachable, FetchData fetcher)
   {
       boolean download = shouldDownload(cachable, fetcher);
 
