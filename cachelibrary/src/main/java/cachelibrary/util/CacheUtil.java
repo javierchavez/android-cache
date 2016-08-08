@@ -1,11 +1,13 @@
 package cachelibrary.util;
 
 
+import android.support.v4.util.Pair;
 import cachelibrary.io.DataCache;
 import cachelibrary.io.Serializer;
 import cachelibrary.model.Cachable;
 import cachelibrary.net.FetchData;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -97,8 +99,9 @@ public class CacheUtil
   }
 
 
-  public static final void getData(List<? extends Cachable> cachables, FetchData fetcher, List<Tuple<?,?>> accumulator)
+  public static final ArrayList<Pair<?, Cachable>> getData(List<? extends Cachable> cachables, FetchData fetcher)
   {
+    ArrayList<Pair<?, Cachable>> accumulator = new ArrayList<>();
     for (Cachable cachable : cachables)
     {
       Object obj = getData(cachable, fetcher);
@@ -107,14 +110,16 @@ public class CacheUtil
       {
         for (Object object : ((List) obj))
         {
-          accumulator.add(new Tuple<>(object, cachable));
+          accumulator.add(new Pair<>(object, cachable));
         }
       }
       else
       {
-        accumulator.add(new Tuple<>(obj, cachable));
+        accumulator.add(new Pair<>(obj, cachable));
       }
     }
+
+    return accumulator;
   }
 
 }
