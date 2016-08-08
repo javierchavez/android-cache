@@ -97,7 +97,7 @@ public class CacheUtil
   }
 
 
-  public static final void getData(List<? extends Cachable> cachables, FetchData fetcher, List<Tuple> accumulator)
+  public static final void getData(List<? extends Cachable> cachables, FetchData fetcher, List<Tuple<?,?>> accumulator)
   {
     for (Cachable cachable : cachables)
     {
