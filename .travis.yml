@@ -4,6 +4,8 @@ jdk: oraclejdk8
 android:
   components:
   - build-tools-24.0.1
-  - platform-tools
+  - platform-tools-24.0.1
   - tools
   - android-22
+
+script: ./gradlew assembleRelease
