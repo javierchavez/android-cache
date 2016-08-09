@@ -18,7 +18,8 @@ public class DataCache
   private final Context mContext;
 
   /**
-   * Not allowed
+   * This is private to enforce Singleton pattern.
+   * @param context application/activity context.
    */
   private DataCache (Context context)
   {
@@ -64,18 +65,6 @@ public class DataCache
   {
     save(filename, data.getBytes(), System.currentTimeMillis());
   }
-
-
-  /**
-   * Save to disk
-   *
-   * @param filename to save the data as
-   */
-  public FileOutputStream saveCalendar (String filename) throws FileNotFoundException
-  {
-    return mContext.openFileOutput(filename, Context.MODE_PRIVATE);
-  }
-
 
 
   /**
