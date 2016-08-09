@@ -7,12 +7,9 @@ import cachelibrary.io.Serializer;
 import cachelibrary.model.Cachable;
 import cachelibrary.net.FetchData;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
-public class CacheUtil
+public final class CacheUtil
 {
 
   public static final boolean shouldDownload (Cachable mParam, FetchData fetcher)
@@ -99,23 +96,23 @@ public class CacheUtil
   }
 
 
-  public static final ArrayList<Pair<?, ? extends Cachable>> getData(List<? extends Cachable> cachables, FetchData fetcher)
+  public static final <T, V extends Cachable> ArrayList<Pair<T, V>> getData(List<V> cachables, FetchData fetcher)
   {
-    ArrayList<Pair<?, ? extends Cachable>> accumulator = new ArrayList<>();
+    ArrayList<Pair<T, V>> accumulator = new ArrayList<>();
     for (Cachable cachable : cachables)
     {
       Object obj = getData(cachable, fetcher);
 
       if (obj instanceof List)
       {
-        for (Object object : ((List) obj))
+        for (T object : ((List<T>) obj))
         {
-          accumulator.add(new Pair<>(object, cachable));
+          accumulator.add(new Pair(object, cachable));
         }
       }
       else
       {
-        accumulator.add(new Pair<>(obj, cachable));
+        accumulator.add(new Pair(obj, cachable));
       }
     }
 
