@@ -14,17 +14,19 @@ import java.util.Map;
  *
  * This only fetches data. It will need to be called from within a Task to prevent holding UI.
  */
-public class FetchData
+public class FetchData implements Fetch
 {
 
   private static final String TAG = "Fetch";
   private static final String CACHE_HEADER = "Cache-Control";
 
+  @Override
   public byte[] get (Cachable cachable)
   {
     return get(cachable, true);
   }
 
+  @Override
   public byte[] get (Cachable cachable, boolean useCache)
   {
     return send("GET", cachable, useCache);
