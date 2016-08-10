@@ -14,7 +14,7 @@ import java.util.Map;
  *
  * This only fetches data. It will need to be called from within a Task to prevent holding UI.
  */
-public class FetchData implements Fetch
+public class CachedFetch implements Fetch
 {
 
   private static final String TAG = "Fetch";

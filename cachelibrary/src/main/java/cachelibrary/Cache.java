@@ -7,7 +7,8 @@ import android.support.v4.util.Pair;
 import android.util.Log;
 import cachelibrary.io.Serializer;
 import cachelibrary.model.Cachable;
-import cachelibrary.net.FetchData;
+import cachelibrary.net.CachedFetch;
+import cachelibrary.net.Fetch;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class Cache
   private static final String TAG = "Cache";
   private static Cache instance;
   private final Context mContext;
-  private final FetchData fetcher;
+  private final Fetch fetcher;
 
   /**
    * This is private to enforce Singleton pattern.
@@ -33,10 +34,10 @@ public class Cache
    */
   private Cache (Context context)
   {
-    this(context, new FetchData());
+    this(context, new CachedFetch());
   }
 
-  private Cache (Context context, FetchData fetcher)
+  private Cache (Context context, Fetch fetcher)
   {
     this.mContext = context;
     this.fetcher = fetcher;
@@ -78,7 +79,7 @@ public class Cache
    * @param context Application context
    * @param fetcher provide custom fetcher
    */
-  public static void init (Context context, FetchData fetcher)
+  public static void init (Context context, CachedFetch fetcher)
   {
     if (instance == null)
     {

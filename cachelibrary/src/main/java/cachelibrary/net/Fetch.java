@@ -1,8 +1,12 @@
 package cachelibrary.net;
 
-/**
- * Created by javier on 8/10/16.
- */
+
+import cachelibrary.model.Cachable;
+
 public interface Fetch
 {
+
+  byte[] get (Cachable cachable);
+
+  byte[] get (Cachable cachable, boolean useCache);
 }
