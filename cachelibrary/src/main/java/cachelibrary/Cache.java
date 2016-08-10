@@ -138,6 +138,7 @@ public class Cache
    * @return list of {@link Pair}'s where the first is T the POJO returned from serializer and
    * second is the corresponding {@link Cachable} implementing class.
    */
+  @SuppressWarnings("unchecked")
   public final <T, V extends Cachable> List<Pair<T, V>> getData(List<V> cachables)
   {
     List<Pair<T, V>> accumulator = new ArrayList<>();

@@ -1,5 +1,8 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
 
+group = 'com.github.javierchavez'
+version = '1.0'
 
 android {
     compileSdkVersion 23
@@ -15,6 +18,53 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    productFlavors {
+        production {
+
+        }
+    }
+
+    defaultPublishConfig "productionRelease"
+    publishNonDefault true
+}
+
+// build a jar with source files
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    failOnError  false
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    classpath += fileTree(dir: "$buildDir/intermediates/exploded-aar/", include:"**/classes.jar")
+    classpath += configurations.compile
+}
+
+// build a jar with javadoc
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+
+if( android.productFlavors.size() > 0 ) {
+    android.libraryVariants.all { variant ->
+        if( android.publishNonDefault && variant.name == android.defaultPublishConfig ) {
+            def name = variant.buildType.name
+            def task = project.tasks.create "jar${name.capitalize()}", Jar
+            task.dependsOn variant.javaCompile
+            task.from variant.javaCompile.destinationDir
+            artifacts.add('archives', task);
         }
     }
 }
