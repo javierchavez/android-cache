@@ -1,14 +1,9 @@
 package cachelibrary.net;
 
-
-import android.app.Activity;
 import android.util.Log;
-import cachelibrary.io.DataCache;
 import cachelibrary.model.Cachable;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.util.List;
 import java.util.Map;
@@ -23,79 +18,92 @@ public class FetchData
 {
 
   private static final String TAG = "Fetch";
+  private static final String CACHE_HEADER = "Cache-Control";
 
-  public FetchData (Activity activity)
+  public byte[] get (Cachable cachable)
   {
+    return get(cachable, true);
   }
 
-
-  public Void get (Cachable dataset)
+  public byte[] get (Cachable cachable, boolean useCache)
   {
-    return send("GET", dataset, true);
+    return send("GET", cachable, useCache);
   }
 
-  public byte[] getData (Cachable dataset)
+  public Map<String, List<String>> head (Cachable cachable)
   {
-    return send("GET", dataset, false);
-  }
-
-  public Map<String, List<String>> head (Cachable dataset)
-  {
-    return send("HEAD", dataset, false);
+    throw new RuntimeException("Not Yet Implemented");
+    // return send("HEAD", cachable, false);
   }
 
   @SuppressWarnings("unchecked")
-  private <T> T send(String method, Cachable dataset, boolean cache)
+  private <T> T send(String method, Cachable cachable, boolean cache)
   {
     try
     {
-
-      HttpURLConnection connection = (HttpURLConnection) dataset.url().openConnection();
-      // connection.setRequestProperty("If-None-Match", "\"49b3214-903c6-534d333effcf7\"");
-      connection.setRequestMethod(method);
-      connection.connect();
-
-      int len = connection.getContentLength();
-      int _rCode = connection.getResponseCode();
-      Log.d(TAG, "HTTP " + connection.getRequestMethod() + " " + connection.toString());
-
-      if (_rCode == -1 || _rCode == HttpURLConnection.HTTP_NOT_MODIFIED)
+      // HttpResponseCache responseCache = HttpResponseCache.getInstalled();
+      // Log.i(TAG, "Hit count: " + responseCache.getHitCount());
+      // Log.i(TAG, "HTTP req count: " + responseCache.getRequestCount());
+      HttpURLConnection connection = setUpConnection(cachable, cache);
+      InputStream inputStream;
+      try
       {
-        Log.d(TAG, "HTTP " + String.valueOf(_rCode));
-        return null;
+        inputStream = connection.getInputStream();
       }
-      if (method.equals("HEAD"))
+      catch (FileNotFoundException e)
       {
-        return (T) connection.getHeaderFields();
+        connection.disconnect();
+        
+        connection = setUpConnection(cachable, false);
+        connection.setRequestMethod(method);
+        connection.connect();
+
+        // int len = connection.getContentLength();
+        // int _rCode = connection.getResponseCode();
+
+        // Log.d(TAG, "HTTP " + connection.getRequestMethod() + " " + connection.toString());
+        inputStream = connection.getInputStream();
       }
 
-      BufferedInputStream inputStream = new BufferedInputStream(connection.getInputStream());
+      BufferedInputStream bufferedInputStream = new BufferedInputStream(inputStream);
       ByteArrayOutputStream output = new ByteArrayOutputStream();
 
       int data;
-      while ((data = inputStream.read()) != -1)
+      while ((data = bufferedInputStream.read()) != -1)
       {
         output.write(data);
       }
 
-      inputStream.close();
+      bufferedInputStream.close();
+      connection.disconnect();
 
-      if (cache)
-      {
-        Log.d(TAG, "Saving cache for " + dataset.fileName());
-        DataCache.getInstance().save(dataset.fileName(), output.toByteArray(), connection.getLastModified());
-      }
-      else
-      {
-        return (T) output.toByteArray();
-      }
+      return (T) output.toByteArray();
 
     }
     catch(IOException e)
     {
-      Log.e(TAG, "IO " + dataset, e);
+      Log.e(TAG, "IO " + cachable, e);
     }
 
     return null;
+  }
+
+
+  private final static HttpURLConnection setUpConnection(Cachable cachable, boolean cache) throws IOException
+  {
+    HttpURLConnection connection = (HttpURLConnection) cachable.url().openConnection();
+    connection.setUseCaches(true);
+
+
+    if (!cache || cachable.expiration() == 0)
+    {
+      connection.addRequestProperty(CACHE_HEADER, "no-cache");
+    }
+    else
+    {
+      connection.addRequestProperty(CACHE_HEADER, "max-stale=" + cachable.expiration());
+      connection.addRequestProperty(CACHE_HEADER, "only-if-cached");
+    }
+    return connection;
   }
 }

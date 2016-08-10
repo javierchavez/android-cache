@@ -9,10 +9,10 @@ import java.net.URL;
  */
 public interface Cachable
 {
-  long MONTH = 2592000000L;
-  long DAY = 86400000L;
-  long HOUR = 3600000L;
-  long ALWAYS = 10000L;
+  long MONTH  = 60 * 60 * 24 * 28;
+  long DAY    = 60 * 60 * 24;
+  long HOUR   = 60 * 60;
+  long ALWAYS = 0L;
 
 
   /**
@@ -26,7 +26,7 @@ public interface Cachable
    * How long shall the data be cached/how long to wait to check until new
    * data is available.
    *
-   * @return millis until next check.
+   * @return seconds until next check.
    */
   long expiration ();
 
@@ -37,10 +37,4 @@ public interface Cachable
    */
   Serializer getSerializer ();
 
-  /**
-   * Name of the cache
-   *
-   * @return String name of the cache.
-   */
-  String fileName ();
 }
