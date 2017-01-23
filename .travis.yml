@@ -3,15 +3,15 @@ jdk: oraclejdk8
 
 env:
   global:
-    - ANDROID_TARGET=android-24
+    - ANDROID_TARGET=android-25
 android:
   components:
   - platform-tools
   - tools
-  - build-tools-24.0.1
-  - android-24
+  - build-tools-24.0.3
+  - android-25
   - extra-android-support
   - extra-android-m2repository
   - extra-google-m2repository
 
-script: ./gradlew build
+script: ./gradlew test
