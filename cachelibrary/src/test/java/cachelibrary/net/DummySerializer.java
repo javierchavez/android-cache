@@ -1,13 +1,11 @@
 package cachelibrary.net;
 
-import android.content.Context;
 import android.support.v4.util.Pair;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.mockito.Mock;
 
 import java.util.ArrayList;
 
