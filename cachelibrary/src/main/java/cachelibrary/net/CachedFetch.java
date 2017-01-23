@@ -1,6 +1,9 @@
 package cachelibrary.net;
 
+import android.net.http.HttpResponseCache;
 import android.util.Log;
+
+import cachelibrary.BuildConfig;
 import cachelibrary.model.Cachable;
 
 import java.io.*;
@@ -14,7 +17,7 @@ import java.util.Map;
  *
  * This only fetches data. It will need to be called from within a Task to prevent holding UI.
  */
-public class CachedFetch implements Fetch
+public class CachedFetch extends Fetch
 {
 
   private static final String TAG = "Fetch";
@@ -32,20 +35,16 @@ public class CachedFetch implements Fetch
     return send("GET", cachable, useCache);
   }
 
-  public Map<String, List<String>> head (Cachable cachable)
+  @Override
+  public byte[] head (Cachable cachable)
   {
-    throw new RuntimeException("Not Yet Implemented");
-    // return send("HEAD", cachable, false);
+    return send("HEAD", cachable, false);
   }
 
-  @SuppressWarnings("unchecked")
-  private <T> T send(String method, Cachable cachable, boolean cache)
+  private byte[] send(String method, Cachable cachable, boolean cache)
   {
     try
     {
-      // HttpResponseCache responseCache = HttpResponseCache.getInstalled();
-      // Log.i(TAG, "Hit count: " + responseCache.getHitCount());
-      // Log.i(TAG, "HTTP req count: " + responseCache.getRequestCount());
       HttpURLConnection connection = setUpConnection(cachable, cache);
       InputStream inputStream;
       try
@@ -60,10 +59,6 @@ public class CachedFetch implements Fetch
         connection.setRequestMethod(method);
         connection.connect();
 
-        // int len = connection.getContentLength();
-        // int _rCode = connection.getResponseCode();
-
-        // Log.d(TAG, "HTTP " + connection.getRequestMethod() + " " + connection.toString());
         inputStream = connection.getInputStream();
       }
 
@@ -79,15 +74,15 @@ public class CachedFetch implements Fetch
       bufferedInputStream.close();
       connection.disconnect();
 
-      return (T) output.toByteArray();
+      return output.toByteArray();
 
     }
     catch(IOException e)
     {
-      Log.e(TAG, "IO " + cachable, e);
+      // e.printStackTrace();
     }
 
-    return null;
+    return new byte[0];
   }
 
 
@@ -108,4 +103,5 @@ public class CachedFetch implements Fetch
     }
     return connection;
   }
+
 }

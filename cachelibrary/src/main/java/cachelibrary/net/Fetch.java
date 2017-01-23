@@ -1,12 +1,28 @@
 package cachelibrary.net;
 
 
+import android.net.http.HttpResponseCache;
+
 import cachelibrary.model.Cachable;
 
-public interface Fetch
+public abstract class Fetch
 {
 
-  byte[] get (Cachable cachable);
+  private HttpResponseCache cache;
 
-  byte[] get (Cachable cachable, boolean useCache);
+  public abstract byte[] get (Cachable cachable);
+
+  public abstract byte[] get (Cachable cachable, boolean useCache);
+
+  public abstract byte[] head (Cachable cachable);
+
+  public void setCache(HttpResponseCache cache)
+  {
+    this.cache = cache;
+  }
+
+  public HttpResponseCache getCache()
+  {
+    return cache;
+  }
 }

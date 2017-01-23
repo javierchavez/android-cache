@@ -3,6 +3,7 @@ package cachelibrary;
 
 import android.content.Context;
 import android.net.http.HttpResponseCache;
+import android.support.annotation.NonNull;
 import android.support.v4.util.Pair;
 import android.util.Log;
 import cachelibrary.io.Serializer;
@@ -25,7 +26,6 @@ public class Cache
 {
   private static final String TAG = "Cache";
   private static Cache instance;
-  private final Context mContext;
   private final Fetch fetcher;
 
   /**
@@ -39,7 +39,6 @@ public class Cache
 
   private Cache (Context context, Fetch fetcher)
   {
-    this.mContext = context;
     this.fetcher = fetcher;
     if(HttpResponseCache.getInstalled() == null)
     {
@@ -52,7 +51,10 @@ public class Cache
       }
       catch(IOException e)
       {
-        Log.i(TAG, "HTTP response cache installation failed:" + e);
+        if (BuildConfig.DEBUG)
+        {
+          Log.i(TAG, "HTTP response cache installation failed:" + e);
+        }
       }
     }
 
@@ -170,9 +172,9 @@ public class Cache
    * @param filename to save the data as
    * @param data actual data to be stored.
    */
-  private void save (String filename, String data)
+  public void save (Context context, String filename, String data)
   {
-    save(filename, data.getBytes(), System.currentTimeMillis());
+    save(context, filename, data.getBytes(), System.currentTimeMillis());
   }
 
 
@@ -183,17 +185,23 @@ public class Cache
    * @param data actual data to be stored.
    * @param lastModified epoch time in milliseconds, last modified time.
    */
-  private void save (String filename, byte[] data, long lastModified)
+  public void save (Context context, String filename, byte[] data, long lastModified)
   {
-    File file = mContext.getFileStreamPath(filename);
+    File file = context.getFileStreamPath(filename);
     boolean didSave = file.setLastModified(lastModified);
     if (didSave)
     {
-      Log.i(TAG, "setting last-modified: " + new Date(lastModified));
+      if (BuildConfig.DEBUG)
+      {
+        Log.i(TAG, "setting last-modified: " + new Date(lastModified));
+      }
     }
     else
     {
-      Log.i(TAG, "last-modified not saved");
+      if (BuildConfig.DEBUG)
+      {
+        Log.i(TAG, "last-modified not saved");
+      }
     }
 
     try
@@ -214,7 +222,10 @@ public class Cache
     }
     catch(IOException e)
     {
-      Log.e(TAG, "IO error trying to save cache", e);
+      if (BuildConfig.DEBUG)
+      {
+        Log.e(TAG, "IO error trying to save cache", e);
+      }
     }
   }
 
@@ -225,10 +236,10 @@ public class Cache
    * @param filename that contains data.
    * @return byte array containing data from cached file.
    */
-  private byte[] retrieve (String filename)
+  public byte[] retrieve (Context context, String filename)
   {
 
-    File file = mContext.getFileStreamPath(filename);
+    File file = context.getFileStreamPath(filename);
     byte[] bFile = new byte[(int) file.length()];
     FileInputStream fileInputStream = null;
     try
@@ -240,7 +251,10 @@ public class Cache
     }
     catch (Exception e)
     {
-      Log.e(TAG, "IO Error reading cache", e);
+      if (BuildConfig.DEBUG)
+      {
+        Log.e(TAG, "IO Error reading cache", e);
+      }
     }
 
     return bFile;
@@ -252,9 +266,9 @@ public class Cache
    * @param filename file name to get
    * @return epoch milli.
    */
-  private long getLastModified (String filename)
+  public long getLastModified (Context context, String filename)
   {
-    File file = mContext.getFileStreamPath(filename);
+    File file = context.getFileStreamPath(filename);
     return file.lastModified();
   }
 
